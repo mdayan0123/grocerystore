@@ -1,0 +1,157 @@
+body {
+  background: #121212;
+  color: #fff;
+  font-family: Arial;
+}
+
+.gradient-text {
+  background: linear-gradient(45deg, #ff8a00, #ff2d55);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.login-card {
+  width: 360px;
+  margin: 80px auto;
+  background: #1a1b1f;
+  padding: 25px;
+  border-radius: 16px;
+  box-shadow: 0 0 20px #0005;
+}
+
+label {
+  display: block;
+  margin-top: 15px;
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  border: none;
+  background: #111;
+  color: #fff;
+  border-radius: 10px;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.role-btn {
+  width: 48%;
+  padding: 12px;
+  border: none;
+  border-radius: 12px;
+  background: #ff8a00;
+  color: #fff;
+  font-weight: bold;
+}
+
+.role-btn.owner {
+  background: #ff2d55;
+}
+
+.grad-btn {
+  background: linear-gradient(to right, #ff8a00, #ff2d55);
+  padding: 12px;
+  width: 100%;
+  border: none;
+  color: #fff;
+  border-radius: 12px;
+  margin-top: 20px;
+  font-weight: bold;
+}
+
+.back-btn {
+  background: none;
+  color: #ccc;
+  border: none;
+  margin-bottom: 15px;
+}
+
+.container {
+  width: 380px;
+  margin: auto;
+  padding: 20px;
+}
+
+.product-list {
+  margin-top: 20px;
+}
+
+.prod-card {
+  background: #1a1c20;
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 16px;
+  text-align: center;
+  box-shadow: 0 0 12px #0006;
+}
+
+.card-header {
+  height: 50px;
+  background: linear-gradient(to right, #ff8a00, #ff2d55);
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
+.prod-img {
+  width: 100%;
+  border-radius: 12px;
+  margin-bottom: 10px;
+}
+
+.price {
+  color: #ff8a00;
+  margin: 5px 0;
+}
+
+.grad-btn-small {
+  background: linear-gradient(to right, #ff8a00, #ff2d55);
+  padding: 10px;
+  width: 100%;
+  border-radius: 12px;
+  border: none;
+  color: #fff;
+  margin-top: 10px;
+}
+
+.inv-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.order-card {
+  background: #1a1c20;
+  padding: 15px;
+  margin-top: 15px;
+  border-radius: 16px;
+}
+
+.green-btn {
+  background: #00b43c;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 12px;
+  color: #fff;
+  margin-right: 10px;
+}
+
+.red-btn {
+  background: #ff3030;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 12px;
+  color: #fff;
+}
+
+.status-box {
+  margin-top: 15px;
+  padding: 12px;
+  background: #1f1f23;
+  border-radius: 12px;
+  text-align: center;
+}
