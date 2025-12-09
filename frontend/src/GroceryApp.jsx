@@ -38,12 +38,25 @@ const GroceryApp = () => {
     setCurrentScreen('login');
   };
 
-  const handleSendOTP = () => {
-    if (userData.phone.length === 10) {
+  const API = "http://3.236.177.251:30484";
+
+const handleSendOTP = async () => {
+  try {
+    const res = await fetch(`${API}/api/send-otp`, {
+      method: "POST",
+      headers: { "Content-Type":"application/json" },
+      body: JSON.stringify({ phone: userData.phone }),
+    });
+
+    const data = await res.json();
+    if(data.success){
       setOtpSent(true);
-      alert('OTP sent to your phone: 1234');
-    }
-  };
+      alert("OTP sent successfully");
+    } else alert("OTP Failed!");
+  } catch {
+    alert("Backend not reachable!");
+  }
+};
 
   const handleLogin = () => {
     if (userData.otp === '1234') {
@@ -596,5 +609,6 @@ const GroceryApp = () => {
 
   return null;
 };
+
 
 export default GroceryApp;
