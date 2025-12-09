@@ -7,6 +7,14 @@ const PORT = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(express.json());
+// Allow Frontend Access
+app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Methods", "GET, POST, PATCH, PUT, DELETE");
+    res.header("Access-Control-Allow-Headers", "Content-Type");
+    next();
+});
+
 
 //=====================================================
 // Database (In-Memory Data Storage)
@@ -107,3 +115,4 @@ app.listen(PORT, "0.0.0.0", () => {
   console.log(`🚀 Server Started → http://0.0.0.0:${PORT}`);
   console.log(`🏪 Shops Loaded: ${shops.length}`);
 });
+
