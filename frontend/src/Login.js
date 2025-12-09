@@ -5,9 +5,11 @@ function Login({ onSuccess }) {
   const [otp, setOtp] = useState("");
   const [otpSent, setOtpSent] = useState(false);
 
+  const API_BASE = "http://3.236.177.251:30484";
+
   async function sendOtp() {
     try {
-      const res = await fetch("http://3.236.177.251:30484/api/send-otp", {
+      const res = await fetch(`${API_BASE}/api/send-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ phone }),
@@ -15,32 +17,33 @@ function Login({ onSuccess }) {
 
       const data = await res.json();
 
-      if (data.ok) {
-        alert("Testing OTP = " + data.testOtp);
+      if (data.success) {
+        alert("OTP sent successfully! (Test OTP = 1234)");
         setOtpSent(true);
       } else {
         alert("Failed to send OTP");
       }
     } catch (err) {
-      alert("Error sending OTP. Backend may be OFF.");
+      alert("Error sending OTP. Backend might be down.");
       console.log(err);
     }
   }
 
   async function verifyOtp(role) {
     try {
-      const res = await fetch("http://3.236.177.251:30484/api/send-otp", {
+      const res = await fetch(`${API_BASE}/api/verify-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone, otp }),
+        body: JSON.stringify({ phone, otp, role, name: "User" }),
       });
 
       const data = await res.json();
 
-      if (data.ok) {
-        onSuccess(phone, role);
+      if (data.success) {
+        alert("Login successful 🚀");
+        onSuccess(data.user);
       } else {
-        alert("Invalid OTP!");
+        alert("Invalid OTP ❌");
       }
     } catch (err) {
       alert("Error verifying OTP");
@@ -55,34 +58,19 @@ function Login({ onSuccess }) {
       {!otpSent && (
         <>
           <label>Phone Number</label>
-          <input
-            type="text"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-          />
-
-          <button className="grad-btn" onClick={sendOtp}>
-            Send OTP
-          </button>
+          <input type="text" value={phone} onChange={(e) => setPhone(e.target.value)} />
+          <button className="grad-btn" onClick={sendOtp}>Send OTP</button>
         </>
       )}
 
       {otpSent && (
         <>
           <label>Enter OTP</label>
-          <input
-            type="text"
-            value={otp}
-            onChange={(e) => setOtp(e.target.value)}
-          />
+          <input type="text" value={otp} onChange={(e) => setOtp(e.target.value)} />
 
           <div className="row">
-            <button className="role-btn" onClick={() => verifyOtp("user")}>
-              Login as User
-            </button>
-            <button className="role-btn owner" onClick={() => verifyOtp("owner")}>
-              Login as Owner
-            </button>
+            <button className="role-btn" onClick={() => verifyOtp("user")}>Login as User</button>
+            <button className="role-btn owner" onClick={() => verifyOtp("owner")}>Login as Owner</button>
           </div>
         </>
       )}
@@ -91,4 +79,3 @@ function Login({ onSuccess }) {
 }
 
 export default Login;
-
