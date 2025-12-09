@@ -6,7 +6,7 @@ function Products({ onBack }) {
   const [orderInfo, setOrderInfo] = useState(null);
 
   useEffect(() => {
-    fetch("http://localhost:4000/api/products")
+    fetch("http://3.236.177.251:30484/api/products")
       .then((r) => r.json())
       .then((d) => setProducts(d.products));
   }, []);
@@ -24,7 +24,7 @@ function Products({ onBack }) {
       qty: cart[id],
     }));
 
-    const res = await fetch("http://localhost:4000/api/orders", {
+    const res = await fetch("http://3.236.177.251:30484/api/orders", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ items, address: "User Address" }),
@@ -72,3 +72,4 @@ function Products({ onBack }) {
 }
 
 export default Products;
+
