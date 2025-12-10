@@ -5,7 +5,7 @@ function Login({ onSuccess }) {
   const [otp, setOtp] = useState("");
   const [otpSent, setOtpSent] = useState(false);
 
-  const API_BASE = "http://3.236.177.251:30484";
+  const API_BASE = "http://13.219.250.20:30484";
 
   async function sendOtp() {
     try {
@@ -79,3 +79,4 @@ function Login({ onSuccess }) {
 }
 
 export default Login;
+
