@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { ShoppingCart, Store, Phone, Clock, CheckCircle, XCircle, Package, LogOut } from 'lucide-react';
 
-const API_URL = 'http://localhost:5000/api';
-
 const GroceryApp = () => {
   const [currentScreen, setCurrentScreen] = useState('role-select');
   const [userRole, setUserRole] = useState(null);
-  const [userData, setUserData] = useState({ name: '', phone: '', otp: '', id: null, shopId: null });
+  const [userData, setUserData] = useState({ name: '', phone: '', otp: '' });
   const [otpSent, setOtpSent] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   
@@ -14,7 +12,13 @@ const GroceryApp = () => {
   const [userOrders, setUserOrders] = useState([]);
   
   const [ownerShop, setOwnerShop] = useState({ id: 1, name: 'Fresh Mart' });
-  const [inventory, setInventory] = useState([]);
+  const [inventory, setInventory] = useState([
+    { id: 1, name: 'Milk', price: 60, stock: 50 },
+    { id: 2, name: 'Bread', price: 40, stock: 30 },
+    { id: 3, name: 'Eggs (12)', price: 80, stock: 40 },
+    { id: 4, name: 'Rice (1kg)', price: 70, stock: 100 },
+    { id: 5, name: 'Sugar (1kg)', price: 50, stock: 80 },
+  ]);
   const [pendingOrders, setPendingOrders] = useState([]);
   const [acceptedOrders, setAcceptedOrders] = useState([]);
 
@@ -29,148 +33,33 @@ const GroceryApp = () => {
     { id: 8, name: 'Potatoes (1kg)', price: 30, image: '🥔' },
   ];
 
-  // Fetch pending orders for owners
-  useEffect(() => {
-    if (userRole === 'owner' && isLoggedIn) {
-      const interval = setInterval(fetchPendingOrders, 2000);
-      return () => clearInterval(interval);
-    }
-  }, [userRole, isLoggedIn]);
-
-  // Fetch shop orders for owners
-  useEffect(() => {
-    if (userRole === 'owner' && isLoggedIn && userData.shopId) {
-      fetchShopOrders();
-      const interval = setInterval(fetchShopOrders, 3000);
-      return () => clearInterval(interval);
-    }
-  }, [userRole, isLoggedIn, userData.shopId]);
-
-  // Fetch user orders
-  useEffect(() => {
-    if (userRole === 'user' && isLoggedIn && userData.id) {
-      fetchUserOrders();
-      const interval = setInterval(fetchUserOrders, 3000);
-      return () => clearInterval(interval);
-    }
-  }, [userRole, isLoggedIn, userData.id]);
-
-  // Fetch inventory for owners
-  useEffect(() => {
-    if (userRole === 'owner' && isLoggedIn && userData.shopId) {
-      fetchInventory();
-    }
-  }, [userRole, isLoggedIn, userData.shopId]);
-
-  const fetchPendingOrders = async () => {
-    try {
-      const response = await fetch(`${API_URL}/orders/pending`);
-      const data = await response.json();
-      setPendingOrders(data.orders);
-    } catch (error) {
-      console.error('Error fetching pending orders:', error);
-    }
-  };
-
-  const fetchShopOrders = async () => {
-    try {
-      const response = await fetch(`${API_URL}/orders/shop/${userData.shopId}`);
-      const data = await response.json();
-      setAcceptedOrders(data.orders);
-    } catch (error) {
-      console.error('Error fetching shop orders:', error);
-    }
-  };
-
-  const fetchUserOrders = async () => {
-    try {
-      const response = await fetch(`${API_URL}/orders/user/${userData.id}`);
-      const data = await response.json();
-      setUserOrders(data.orders);
-    } catch (error) {
-      console.error('Error fetching user orders:', error);
-    }
-  };
-
-  const fetchInventory = async () => {
-    try {
-      const response = await fetch(`${API_URL}/shops/${userData.shopId}/inventory`);
-      const data = await response.json();
-      setInventory(data.inventory);
-    } catch (error) {
-      console.error('Error fetching inventory:', error);
-    }
-  };
-
   const handleRoleSelect = (role) => {
     setUserRole(role);
     setCurrentScreen('login');
   };
 
-  const handleSendOTP = async () => {
+  const handleSendOTP = () => {
     if (userData.phone.length === 10) {
-      try {
-        await fetch(`${API_URL}/send-otp`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ phone: userData.phone })
-        });
-        setOtpSent(true);
-        alert('OTP sent to your phone: 1234');
-      } catch (error) {
-        console.error('Error sending OTP:', error);
-        alert('Error sending OTP');
-      }
+      setOtpSent(true);
+      alert('OTP sent to your phone: 1234');
     }
   };
 
-  const handleLogin = async () => {
+  const handleLogin = () => {
     if (userData.otp === '1234') {
-      try {
-        const response = await fetch(`${API_URL}/verify-otp`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            phone: userData.phone,
-            otp: userData.otp,
-            name: userData.name,
-            role: userRole
-          })
-        });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-          setUserData({ ...userData, id: data.user.id, shopId: data.user.shopId });
-          setIsLoggedIn(true);
-          
-          if (userRole === 'owner') {
-            setOwnerShop({ id: data.user.shopId, name: getShopName(data.user.shopId) });
-          }
-          
-          setCurrentScreen(userRole === 'user' ? 'user-dashboard' : 'owner-dashboard');
-        }
-      } catch (error) {
-        console.error('Error logging in:', error);
-        alert('Login failed');
-      }
+      setIsLoggedIn(true);
+      setCurrentScreen(userRole === 'user' ? 'user-dashboard' : 'owner-dashboard');
     } else {
       alert('Invalid OTP');
     }
-  };
-
-  const getShopName = (shopId) => {
-    const names = ['Fresh Mart', 'Quick Grocery', 'Daily Needs'];
-    return names[shopId - 1] || 'Shop';
   };
 
   const handleLogout = () => {
     setIsLoggedIn(false);
     setUserRole(null);
     setCurrentScreen('role-select');
-    setUserData({ name: '', phone: '', otp: '', id: null, shopId: null });
+    setUserData({ name: '', phone: '', otp: '' });
     setOtpSent(false);
-    setCart([]);
   };
 
   const addToCart = (product) => {
@@ -188,87 +77,78 @@ const GroceryApp = () => {
     setCart(cart.filter(item => item.id !== productId));
   };
 
-  const placeOrder = async () => {
+  const placeOrder = () => {
     if (cart.length === 0) return;
     
-    const orderData = {
-      userId: userData.id,
-      userName: userData.name,
-      items: cart,
-      total: cart.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+    const newOrder = {
+      id: Date.now(),
+      items: [...cart],
+      total: cart.reduce((sum, item) => sum + (item.price * item.quantity), 0),
+      status: 'pending',
+      timestamp: new Date().toISOString(),
+      timer: 300,
+      assignedShop: null
     };
+    
+    setUserOrders([newOrder, ...userOrders]);
+    setPendingOrders([newOrder, ...pendingOrders]);
+    setCart([]);
+    alert('Order placed successfully!');
+  };
 
-    try {
-      const response = await fetch(`${API_URL}/orders`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(orderData)
-      });
-      
-      const data = await response.json();
-      
-      if (data.success) {
-        setCart([]);
-        fetchUserOrders();
-        alert('Order placed successfully!');
+  const acceptOrder = (orderId) => {
+    const order = pendingOrders.find(o => o.id === orderId);
+    if (!order) return;
+
+    const canFulfill = order.items.every(item => {
+      const inventoryItem = inventory.find(inv => inv.name === item.name);
+      return inventoryItem && inventoryItem.stock >= item.quantity;
+    });
+
+    if (!canFulfill) {
+      alert('Cannot accept: Insufficient inventory');
+      return;
+    }
+
+    const updatedInventory = inventory.map(inv => {
+      const orderItem = order.items.find(item => item.name === inv.name);
+      if (orderItem) {
+        return { ...inv, stock: inv.stock - orderItem.quantity };
       }
-    } catch (error) {
-      console.error('Error placing order:', error);
-      alert('Failed to place order');
-    }
+      return inv;
+    });
+
+    setInventory(updatedInventory);
+    
+    const updatedOrder = { ...order, status: 'accepted', assignedShop: ownerShop.name };
+    setPendingOrders(pendingOrders.filter(o => o.id !== orderId));
+    setAcceptedOrders([updatedOrder, ...acceptedOrders]);
+    setUserOrders(userOrders.map(o => o.id === orderId ? updatedOrder : o));
   };
 
-  const acceptOrder = async (orderId) => {
-    try {
-      const response = await fetch(`${API_URL}/orders/${orderId}/accept`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          shopId: userData.shopId,
-          shopName: ownerShop.name
-        })
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        fetchPendingOrders();
-        fetchShopOrders();
-        fetchInventory();
-        alert('Order accepted successfully!');
-      } else {
-        alert(data.message || 'Failed to accept order');
-      }
-    } catch (error) {
-      console.error('Error accepting order:', error);
-      alert('Failed to accept order');
-    }
+  const updateInventoryStock = (productId, newStock) => {
+    setInventory(inventory.map(item => 
+      item.id === productId ? { ...item, stock: parseInt(newStock) || 0 } : item
+    ));
   };
 
-  const updateInventoryStock = async (productId, newStock) => {
-    try {
-      await fetch(`${API_URL}/shops/${userData.shopId}/inventory/${productId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ stock: parseInt(newStock) || 0 })
-      });
-      fetchInventory();
-    } catch (error) {
-      console.error('Error updating inventory:', error);
-    }
-  };
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setPendingOrders(orders => 
+        orders.map(order => ({
+          ...order,
+          timer: order.timer > 0 ? order.timer - 1 : 0
+        })).filter(order => order.timer > 0)
+      );
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  const getTimeLeft = (order) => {
-    const now = Date.now();
-    const created = new Date(order.timestamp).getTime();
-    const elapsed = Math.floor((now - created) / 1000);
-    return Math.max(0, 300 - elapsed);
   };
 
   if (currentScreen === 'role-select') {
@@ -576,45 +456,41 @@ const GroceryApp = () => {
                 <p className="text-gray-400 text-center py-8 bg-gray-800 rounded-xl">No pending orders</p>
               ) : (
                 <div className="space-y-4">
-                  {pendingOrders.map(order => {
-                    const timeLeft = getTimeLeft(order);
-                    return (
-                      <div key={order.id} className="bg-gray-800 p-6 rounded-xl border-2 border-orange-600">
-                        <div className="flex items-center justify-between mb-4">
-                          <div>
-                            <p className="text-sm text-gray-400">Order #{order.id}</p>
-                            <p className="text-sm text-gray-400">Customer: {order.userName}</p>
-                            <p className="text-2xl font-bold text-orange-400">
-                              Time Left: {formatTime(timeLeft)}
-                            </p>
-                          </div>
-                          <div className="text-right">
-                            <p className="text-2xl font-bold text-green-400">₹{order.total}</p>
-                          </div>
+                  {pendingOrders.map(order => (
+                    <div key={order.id} className="bg-gray-800 p-6 rounded-xl border-2 border-orange-600">
+                      <div className="flex items-center justify-between mb-4">
+                        <div>
+                          <p className="text-sm text-gray-400">Order #{order.id}</p>
+                          <p className="text-2xl font-bold text-orange-400">
+                            Time Left: {formatTime(order.timer)}
+                          </p>
                         </div>
-                        
-                        <div className="space-y-2 mb-4">
-                          {order.items.map(item => {
-                            const inventoryItem = inventory.find(inv => inv.name === item.name);
-                            const hasStock = inventoryItem && inventoryItem.stock >= item.quantity;
-                            return (
-                              <div key={item.id} className={`flex justify-between ${hasStock ? 'text-gray-300' : 'text-red-400'}`}>
-                                <span>{item.name} x {item.quantity}</span>
-                                <span>{hasStock ? '✓ In Stock' : '✗ Out of Stock'}</span>
-                              </div>
-                            );
-                          })}
+                        <div className="text-right">
+                          <p className="text-2xl font-bold text-green-400">₹{order.total}</p>
                         </div>
-                        
-                        <button
-                          onClick={() => acceptOrder(order.id)}
-                          className="w-full bg-green-600 py-3 rounded-lg font-semibold hover:bg-green-500 transition-colors"
-                        >
-                          Accept Order
-                        </button>
                       </div>
-                    );
-                  })}
+                      
+                      <div className="space-y-2 mb-4">
+                        {order.items.map(item => {
+                          const inventoryItem = inventory.find(inv => inv.name === item.name);
+                          const hasStock = inventoryItem && inventoryItem.stock >= item.quantity;
+                          return (
+                            <div key={item.id} className={`flex justify-between ${hasStock ? 'text-gray-300' : 'text-red-400'}`}>
+                              <span>{item.name} x {item.quantity}</span>
+                              <span>{hasStock ? '✓ In Stock' : '✗ Out of Stock'}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                      
+                      <button
+                        onClick={() => acceptOrder(order.id)}
+                        className="w-full bg-green-600 py-3 rounded-lg font-semibold hover:bg-green-500 transition-colors"
+                      >
+                        Accept Order
+                      </button>
+                    </div>
+                  ))}
                 </div>
               )}
             </div>
@@ -633,7 +509,6 @@ const GroceryApp = () => {
                       <div className="flex items-center justify-between mb-4">
                         <div>
                           <p className="text-sm text-gray-400">Order #{order.id}</p>
-                          <p className="text-sm text-gray-400">Customer: {order.userName}</p>
                           <p className="text-sm text-gray-400">{new Date(order.timestamp).toLocaleString()}</p>
                         </div>
                         <div className="text-right">
