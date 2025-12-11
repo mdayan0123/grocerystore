@@ -5,12 +5,13 @@ function Login({ onSuccess }) {
   const [otp, setOtp] = useState("");
   const [otpSent, setOtpSent] = useState(false);
 
-  // ✅ Correct backend URL
-  const API_BASE = "http://13.219.245.141:30484/api";
+  // ✅ FIX 1: remove /api
+  const API_BASE = "http://13.219.245.141:30484";
 
   async function sendOtp() {
     try {
-      const res = await fetch(`${API_BASE}/send-otp`, {
+      // ✅ FIXED URL
+      const res = await fetch(`${API_BASE}/api/send-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ phone }),
@@ -32,10 +33,11 @@ function Login({ onSuccess }) {
 
   async function verifyOtp(role) {
     try {
-      const res = await fetch(`${API_BASE}/verify-otp`, {
+      // ✅ FIX 2: added name field, corrected URL
+      const res = await fetch(`${API_BASE}/api/verify-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone, otp, role }),
+        body: JSON.stringify({ phone, otp, role, name: "User" }),
       });
 
       const data = await res.json();
