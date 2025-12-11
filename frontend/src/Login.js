@@ -5,12 +5,12 @@ function Login({ onSuccess }) {
   const [otp, setOtp] = useState("");
   const [otpSent, setOtpSent] = useState(false);
 
-  // ✅ CHANGE THIS: Use your backend NodePort URL
+  // ✅ Correct backend URL
   const API_BASE = "http://13.219.245.141:30484/api";
 
   async function sendOtp() {
     try {
-      const res = await fetch(`${API_BASE}/request-otp`, {
+      const res = await fetch(`${API_BASE}/send-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ phone }),
@@ -18,8 +18,8 @@ function Login({ onSuccess }) {
 
       const data = await res.json();
 
-      if (data.ok) {
-        alert("Testing OTP = " + data.testOtp);
+      if (data.success) {
+        alert("OTP sent successfully!");
         setOtpSent(true);
       } else {
         alert("Failed to send OTP");
@@ -35,12 +35,12 @@ function Login({ onSuccess }) {
       const res = await fetch(`${API_BASE}/verify-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone, otp }),
+        body: JSON.stringify({ phone, otp, role }),
       });
 
       const data = await res.json();
 
-      if (data.ok) {
+      if (data.success) {
         onSuccess(phone, role);
       } else {
         alert("Invalid OTP!");
