@@ -5,11 +5,9 @@ function Login({ onSuccess }) {
   const [otp, setOtp] = useState("");
   const [otpSent, setOtpSent] = useState(false);
 
-  const API_BASE = "http://13.219.250.20:30484"; // 🔥 LIVE BACKEND URL
-
   async function sendOtp() {
     try {
-      const res = await fetch(`${API_BASE}/api/send-otp`, {
+      const res = await fetch("http://localhost:4000/api/request-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ phone }),
@@ -17,54 +15,75 @@ function Login({ onSuccess }) {
 
       const data = await res.json();
 
-      if (data.success) {
-        alert("OTP sent successfully! (use OTP: 1234)");
+      if (data.ok) {
+        alert("Testing OTP = " + data.testOtp);
         setOtpSent(true);
       } else {
         alert("Failed to send OTP");
       }
     } catch (err) {
-      alert("Error sending OTP. Backend might be down.");
+      alert("Error sending OTP. Backend may be OFF.");
+      console.log(err);
     }
   }
 
   async function verifyOtp(role) {
     try {
-      const res = await fetch(`${API_BASE}/api/verify-otp`, {
+      const res = await fetch("http://localhost:4000/api/verify-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone, otp, name: "User", role }),
+        body: JSON.stringify({ phone, otp }),
       });
 
       const data = await res.json();
 
-      if (data.success) {
-        alert("Login successful 🚀");
-        onSuccess(data.user);
+      if (data.ok) {
+        onSuccess(phone, role);
       } else {
-        alert("Invalid OTP ❌");
+        alert("Invalid OTP!");
       }
     } catch (err) {
       alert("Error verifying OTP");
+      console.log(err);
     }
   }
 
   return (
     <div className="login-card">
-      <h2>Grocery App Login</h2>
+      <h2 className="gradient-text">Grocery App</h2>
 
       {!otpSent && (
         <>
-          <input placeholder="Phone" value={phone} onChange={(e) => setPhone(e.target.value)} />
-          <button onClick={sendOtp}>Send OTP</button>
+          <label>Phone Number</label>
+          <input
+            type="text"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+          />
+
+          <button className="grad-btn" onClick={sendOtp}>
+            Send OTP
+          </button>
         </>
       )}
 
       {otpSent && (
         <>
-          <input placeholder="Enter OTP" value={otp} onChange={(e) => setOtp(e.target.value)} />
-          <button onClick={() => verifyOtp("user")}>Login as User</button>
-          <button onClick={() => verifyOtp("owner")}>Login as Owner</button>
+          <label>Enter OTP</label>
+          <input
+            type="text"
+            value={otp}
+            onChange={(e) => setOtp(e.target.value)}
+          />
+
+          <div className="row">
+            <button className="role-btn" onClick={() => verifyOtp("user")}>
+              Login as User
+            </button>
+            <button className="role-btn owner" onClick={() => verifyOtp("owner")}>
+              Login as Owner
+            </button>
+          </div>
         </>
       )}
     </div>
