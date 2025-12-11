@@ -7,7 +7,7 @@ function OwnerDashboard({ onBack }) {
   const [orders, setOrders] = useState([]);
 
   useEffect(() => {
-    fetch("http://3.236.177.251:30484/api/shops")
+    fetch("http://localhost:4000/api/shops")
       .then((r) => r.json())
       .then((d) => {
         setShops(d.shops);
@@ -16,13 +16,13 @@ function OwnerDashboard({ onBack }) {
   }, []);
 
   useEffect(() => {
-    fetch(`http://3.236.177.251:30484/api/owner/${shopId}/orders`)
+    fetch(`http://localhost:4000/api/owner/${shopId}/orders`)
       .then((r) => r.json())
       .then((d) => setOrders(d.orders));
   }, [shopId, inventory]);
 
   async function updateInventory() {
-    await fetch(`http://3.236.177.251:304840/api/owner/${shopId}/inventory`, {
+    await fetch(`http://localhost:4000/api/owner/${shopId}/inventory`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ inventory }),
@@ -32,7 +32,7 @@ function OwnerDashboard({ onBack }) {
 
   async function act(id, action) {
     const res = await fetch(
-      `http://3.236.177.251:30484/api/owner/orders/${id}/action`,
+      `http://localhost:4000/api/owner/orders/${id}/action`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -113,4 +113,3 @@ function OwnerDashboard({ onBack }) {
 }
 
 export default OwnerDashboard;
-
