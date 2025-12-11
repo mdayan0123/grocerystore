@@ -5,12 +5,11 @@ function Login({ onSuccess }) {
   const [otp, setOtp] = useState("");
   const [otpSent, setOtpSent] = useState(false);
 
-  // ✅ FIX 1: remove /api
-  const API_BASE = "http://54.236.37.93:30484/api";
+  // Correct base URL (NO extra /api)
+  const API_BASE = "http://54.236.37.93:30484";
 
   async function sendOtp() {
     try {
-      // ✅ FIXED URL
       const res = await fetch(`${API_BASE}/api/send-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -33,7 +32,6 @@ function Login({ onSuccess }) {
 
   async function verifyOtp(role) {
     try {
-      // ✅ FIX 2: added name field, corrected URL
       const res = await fetch(`${API_BASE}/api/verify-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -96,4 +94,3 @@ function Login({ onSuccess }) {
 }
 
 export default Login;
-
