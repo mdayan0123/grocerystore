@@ -1,118 +1,233 @@
-const express = require("express");
-const cors = require("cors");
+const express = require('express');
+const cors = require('cors');
 const app = express();
-
-// Dynamic port support for EC2, Docker, Kubernetes
-const PORT = process.env.PORT || 5000;
+const port = 5000;
 
 app.use(cors());
 app.use(express.json());
-// Allow Frontend Access
-app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Methods", "GET, POST, PATCH, PUT, DELETE");
-    res.header("Access-Control-Allow-Headers", "Content-Type");
-    next();
-});
 
-
-//=====================================================
-// Database (In-Memory Data Storage)
-//=====================================================
+// In-memory storage (use database in production)
 let orders = [];
 let users = [];
 let shops = [
   {
     id: 1,
-    name: "Fresh Mart",
-    priority: 1,
+    name: 'Fresh Mart',
     inventory: [
-      { id: 1, name: "Milk", price: 60, stock: 50, image: "https://images.unsplash.com/photo-1550583724-b2692b85b150?w=400" },
-      { id: 2, name: "Bread", price: 40, stock: 30, image: "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400" },
-      { id: 3, name: "Eggs (12)", price: 80, stock: 40, image: "https://images.unsplash.com/photo-1582722872445-44dc5f7e3c8f?w=400" },
-      { id: 4, name: "Rice (1kg)", price: 70, stock: 100, image: "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=400" },
-      { id: 5, name: "Sugar (1kg)", price: 50, stock: 80, image: "https://images.unsplash.com/photo-1519892300165-cb5542fb47c7?w=400" },
-      { id: 6, name: "Tomatoes (1kg)", price: 30, stock: 60, image: "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=400" },
-      { id: 7, name: "Potatoes (1kg)", price: 25, stock: 70, image: "https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=400" },
-      { id: 8, name: "Onions (1kg)", price: 35, stock: 55, image: "https://images.unsplash.com/photo-1580201092675-a0a6a6cafbb0?w=400" }
+      { id: 1, name: 'Milk', price: 60, stock: 50 },
+      { id: 2, name: 'Bread', price: 40, stock: 30 },
+      { id: 3, name: 'Eggs (12)', price: 80, stock: 40 },
+      { id: 4, name: 'Rice (1kg)', price: 70, stock: 100 },
+      { id: 5, name: 'Sugar (1kg)', price: 50, stock: 80 },
     ]
   },
   {
     id: 2,
-    name: "Quick Grocery",
-    priority: 2,
+    name: 'Quick Grocery',
     inventory: [
-      { id: 1, name: "Milk", price: 60, stock: 40, image: "https://images.unsplash.com/photo-1550583724-b2692b85b150?w=400" },
-      { id: 2, name: "Bread", price: 40, stock: 25, image: "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400" },
-      { id: 3, name: "Eggs (12)", price: 80, stock: 35, image: "https://images.unsplash.com/photo-1582722872445-44dc5f7e3c8f?w=400" },
-      { id: 4, name: "Rice (1kg)", price: 70, stock: 90, image: "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=400" },
-      { id: 5, name: "Sugar (1kg)", price: 50, stock: 70, image: "https://images.unsplash.com/photo-1519892300165-cb5542fb47c7?w=400" },
-      { id: 6, name: "Tomatoes (1kg)", price: 30, stock: 50, image: "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=400" },
-      { id: 7, name: "Potatoes (1kg)", price: 25, stock: 65, image: "https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=400" },
-      { id: 8, name: "Onions (1kg)", price: 35, stock: 45, image: "https://images.unsplash.com/photo-1580201092675-a0a6a6cafbb0?w=400" }
+      { id: 1, name: 'Milk', price: 60, stock: 40 },
+      { id: 2, name: 'Bread', price: 40, stock: 25 },
+      { id: 3, name: 'Eggs (12)', price: 80, stock: 35 },
+      { id: 4, name: 'Rice (1kg)', price: 70, stock: 90 },
+      { id: 5, name: 'Sugar (1kg)', price: 50, stock: 70 },
+    ]
+  },
+  {
+    id: 3,
+    name: 'Daily Needs',
+    inventory: [
+      { id: 1, name: 'Milk', price: 60, stock: 45 },
+      { id: 2, name: 'Bread', price: 40, stock: 28 },
+      { id: 3, name: 'Eggs (12)', price: 80, stock: 38 },
+      { id: 4, name: 'Rice (1kg)', price: 70, stock: 95 },
+      { id: 5, name: 'Sugar (1kg)', price: 50, stock: 75 },
     ]
   }
 ];
 
-//=====================================================
-// API Endpoints
-//=====================================================
-
-// Send OTP
-app.post("/api/send-otp", (req, res) => {
-  console.log("📩 OTP sent to:", req.body.phone);
-  res.json({ success: true, message: "OTP sent" });
+// Send OTP endpoint
+app.post('/api/send-otp', (req, res) => {
+  const { phone } = req.body;
+  console.log(`📱 Sending OTP to ${phone}`);
+  // In production, integrate with SMS service like Twilio
+  res.json({ success: true, message: 'OTP sent successfully' });
 });
 
-// Verify Login
-app.post("/api/verify-otp", (req, res) => {
+// Verify OTP and login
+app.post('/api/verify-otp', (req, res) => {
   const { phone, otp, name, role } = req.body;
-
-  if (otp !== "1234") return res.status(400).json({ success: false, message: "Invalid OTP" });
-
-  let user = users.find(u => u.phone === phone);
-  if (!user) {
-    const count = users.filter(u => u.role === "owner").length;
-    user = { id: Date.now(), phone, name, role, shopId: role === "owner" ? (count % 2) + 1 : null };
-    users.push(user);
+  
+  if (otp === '1234') {
+    let user = users.find(u => u.phone === phone);
+    
+    if (!user) {
+      user = { 
+        id: Date.now(), 
+        phone, 
+        name, 
+        role,
+        shopId: role === 'owner' ? (users.filter(u => u.role === 'owner').length % 3) + 1 : null
+      };
+      users.push(user);
+    }
+    
+    res.json({ success: true, user });
+  } else {
+    res.status(400).json({ success: false, message: 'Invalid OTP' });
   }
-
-  res.json({ success: true, user });
 });
 
-// Create Order
-app.post("/api/orders", (req, res) => {
+// Place order
+app.post('/api/orders', (req, res) => {
   const order = {
     ...req.body,
     id: Date.now(),
-    status: "pending",
-    createdAt: Date.now(),
-    declinedBy: []
+    status: 'pending',
+    timestamp: new Date().toISOString(),
+    timer: 300, // 5 minutes
+    assignedShop: null,
+    createdAt: Date.now()
   };
+  
   orders.push(order);
+  console.log(`📦 New order placed: #${order.id}`);
   res.json({ success: true, order });
 });
 
-// Get User Orders
-app.get("/api/orders/user/:id", (req, res) => {
-  res.json({ orders: orders.filter(o => o.userId == req.params.id) });
+// Get all orders (for users to see their orders)
+app.get('/api/orders/user/:userId', (req, res) => {
+  const { userId } = req.params;
+  const userOrders = orders.filter(o => o.userId === parseInt(userId));
+  res.json({ orders: userOrders });
 });
 
-// Shops
-app.get("/api/shops", (req, res) => {
+// Get pending orders for shops
+app.get('/api/orders/pending', (req, res) => {
+  const now = Date.now();
+  const pendingOrders = orders.filter(o => {
+    const elapsed = Math.floor((now - o.createdAt) / 1000);
+    return o.status === 'pending' && elapsed < 300;
+  });
+  res.json({ orders: pendingOrders });
+});
+
+// Get orders for specific shop
+app.get('/api/orders/shop/:shopId', (req, res) => {
+  const { shopId } = req.params;
+  const shopOrders = orders.filter(o => 
+    o.assignedShopId === parseInt(shopId)
+  );
+  res.json({ orders: shopOrders });
+});
+
+// Accept order
+app.patch('/api/orders/:id/accept', (req, res) => {
+  const { id } = req.params;
+  const { shopId, shopName } = req.body;
+  
+  const orderIndex = orders.findIndex(o => o.id === parseInt(id));
+  
+  if (orderIndex === -1) {
+    return res.status(404).json({ success: false, message: 'Order not found' });
+  }
+
+  const order = orders[orderIndex];
+  const shop = shops.find(s => s.id === shopId);
+  
+  if (!shop) {
+    return res.status(404).json({ success: false, message: 'Shop not found' });
+  }
+
+  // Check inventory
+  const canFulfill = order.items.every(item => {
+    const inventoryItem = shop.inventory.find(inv => inv.name === item.name);
+    return inventoryItem && inventoryItem.stock >= item.quantity;
+  });
+
+  if (!canFulfill) {
+    return res.status(400).json({ success: false, message: 'Insufficient inventory' });
+  }
+
+  // Update inventory
+  order.items.forEach(item => {
+    const inventoryItem = shop.inventory.find(inv => inv.name === item.name);
+    if (inventoryItem) {
+      inventoryItem.stock -= item.quantity;
+    }
+  });
+
+  // Update order
+  orders[orderIndex] = {
+    ...order,
+    status: 'accepted',
+    assignedShop: shopName,
+    assignedShopId: shopId,
+    acceptedAt: new Date().toISOString()
+  };
+
+  console.log(`✅ Order #${id} accepted by ${shopName}`);
+  res.json({ success: true, order: orders[orderIndex] });
+});
+
+// Get shop inventory
+app.get('/api/shops/:shopId/inventory', (req, res) => {
+  const { shopId } = req.params;
+  const shop = shops.find(s => s.id === parseInt(shopId));
+  
+  if (!shop) {
+    return res.status(404).json({ success: false, message: 'Shop not found' });
+  }
+  
+  res.json({ inventory: shop.inventory });
+});
+
+// Update shop inventory
+app.patch('/api/shops/:shopId/inventory/:itemId', (req, res) => {
+  const { shopId, itemId } = req.params;
+  const { stock } = req.body;
+  
+  const shop = shops.find(s => s.id === parseInt(shopId));
+  
+  if (!shop) {
+    return res.status(404).json({ success: false, message: 'Shop not found' });
+  }
+  
+  const item = shop.inventory.find(i => i.id === parseInt(itemId));
+  
+  if (!item) {
+    return res.status(404).json({ success: false, message: 'Item not found' });
+  }
+  
+  item.stock = stock;
+  console.log(`📊 ${shop.name} updated ${item.name} stock to ${stock}`);
+  res.json({ success: true, item });
+});
+
+// Get all shops
+app.get('/api/shops', (req, res) => {
   res.json({ shops: shops.map(s => ({ id: s.id, name: s.name })) });
 });
 
-// Items for customers
-app.get("/api/items", (req, res) => {
-  res.json({ items: shops[0].inventory });
-});
+// Clean up expired orders every 30 seconds
+setInterval(() => {
+  const now = Date.now();
+  const beforeCount = orders.length;
+  
+  orders = orders.filter(o => {
+    if (o.status === 'pending') {
+      const elapsed = Math.floor((now - o.createdAt) / 1000);
+      return elapsed < 300; // Keep orders less than 5 minutes old
+    }
+    return true; // Keep non-pending orders
+  });
+  
+  const removedCount = beforeCount - orders.length;
+  if (removedCount > 0) {
+    console.log(`🧹 Cleaned up ${removedCount} expired orders`);
+  }
+}, 30000);
 
-//=====================================================
-// Start Server (important line for EC2 + Kubernetes)
-//=====================================================
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(`🚀 Server Started → http://0.0.0.0:${PORT}`);
-  console.log(`🏪 Shops Loaded: ${shops.length}`);
+app.listen(port, () => {
+  console.log(`🚀 Backend server running on http://localhost:${port}`);
+  console.log(`📊 ${shops.length} shops initialized`);
 });
-
