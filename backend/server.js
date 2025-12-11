@@ -266,8 +266,8 @@ setInterval(() => {
   }
 }, 30000);
 
-app.listen(port, () => {
-  console.log(`🚀 Backend server running on http://localhost:${port}`);
+app.listen(port, "0.0.0.0", () => {
+  console.log(`🚀 Backend server running on http://0.0.0.0:${port}`);
   console.log(`🏪 ${shops.length} shops initialized:`);
   shops.forEach(shop => {
     console.log(`   - ${shop.name} (Shop ${shop.id}) - Priority: ${shop.priority}`);
