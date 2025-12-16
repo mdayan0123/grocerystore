@@ -3,7 +3,11 @@ const cors = require('cors');
 const app = express();
 const port = 5000;
 
-app.use(cors());
+app.use(cors({
+  origin: "*",
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
 app.use(express.json());
 
 // In-memory storage
@@ -274,3 +278,4 @@ app.listen(port, "0.0.0.0", () => {
   });
   console.log(`📋 Order routing: Shop 1 (0-5 min) → Shop 2 (5-10 min)`);
 });
+
