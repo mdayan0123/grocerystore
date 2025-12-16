@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ShoppingCart, Store, User, Phone, Package, Clock, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = `${process.env.REACT_APP_API_URL}/api`;
 
 export default function GroceryApp() {
   const [currentUser, setCurrentUser] = useState(null);
@@ -685,3 +685,4 @@ export default function GroceryApp() {
     </div>
   );
 }
+
