@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const app = express();
-const port = 5000;
+const port = process.env.PORT || 5000;;
 
 app.use(cors({
   origin: "*",
@@ -278,4 +278,5 @@ app.listen(port, "0.0.0.0", () => {
   });
   console.log(`📋 Order routing: Shop 1 (0-5 min) → Shop 2 (5-10 min)`);
 });
+
 
