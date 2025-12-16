@@ -5,7 +5,7 @@ function Login({ onSuccess }) {
   const [otp, setOtp] = useState("");
   const [otpSent, setOtpSent] = useState(false);
 
-  // Correct base URL (NO extra /api)
+  // ✅ Correct base URL (backend NodePort)
   const API_BASE = `${process.env.REACT_APP_API_URL}/api`;
 
   async function sendOtp() {
@@ -83,7 +83,10 @@ function Login({ onSuccess }) {
             <button className="role-btn" onClick={() => verifyOtp("user")}>
               Login as User
             </button>
-            <button className="role-btn owner" onClick={() => verifyOtp("owner")}>
+            <button
+              className="role-btn owner"
+              onClick={() => verifyOtp("owner")}
+            >
               Login as Owner
             </button>
           </div>
@@ -94,5 +97,3 @@ function Login({ onSuccess }) {
 }
 
 export default Login;
-
-
