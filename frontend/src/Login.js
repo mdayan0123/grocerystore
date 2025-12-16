@@ -10,7 +10,7 @@ function Login({ onSuccess }) {
 
   async function sendOtp() {
     try {
-      const res = await fetch(`${API_BASE}/api/send-otp`, {
+      const res = await fetch(`${API_BASE}/send-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ phone }),
@@ -32,7 +32,7 @@ function Login({ onSuccess }) {
 
   async function verifyOtp(role) {
     try {
-      const res = await fetch(`${API_BASE}/api/verify-otp`, {
+      const res = await fetch(`${API_BASE}/verify-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ phone, otp, role, name: "User" }),
@@ -94,4 +94,5 @@ function Login({ onSuccess }) {
 }
 
 export default Login;
+
 
