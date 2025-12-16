@@ -6,7 +6,7 @@ function Login({ onSuccess }) {
   const [otpSent, setOtpSent] = useState(false);
 
   // Correct base URL (NO extra /api)
-  const API_BASE = "http://54.236.37.93:30484";
+  const API_BASE = `${process.env.REACT_APP_API_URL}/api`;
 
   async function sendOtp() {
     try {
@@ -94,3 +94,4 @@ function Login({ onSuccess }) {
 }
 
 export default Login;
+
